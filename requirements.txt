@@ -1,0 +1,10 @@
+# ============================================================
+# requirements.txt  —  Python dependencies for SecureVault
+# Install with: pip install -r requirements.txt
+# ">=" means "this version or newer" (keeps security patches coming)
+# ============================================================
+
+flask>=3.1           # Web framework: routes, templates, sessions
+cryptography>=44.0   # AES-256-GCM encryption (vetted crypto library)
+python-dotenv>=1.0   # Loads secrets from .env into environment variables
+pytest>=8.0          # Testing framework (Module 7)

@@ -1,0 +1,31 @@
+# ============================================================
+# .gitignore  —  files Git must never track
+# ============================================================
+
+# ---------- SECRETS (most important) ----------
+# Contains real keys. Leaking this = anyone can decrypt all files.
+.env
+
+# ---------- User data ----------
+# Encrypted user uploads. User data never belongs in source control,
+# and it would bloat the repo.
+storage/
+
+# SQLite database: contains usernames and password hashes.
+*.db
+*.sqlite3
+
+# ---------- Python generated files ----------
+# Compiled bytecode, auto-regenerated every run. Useless in Git.
+__pycache__/
+*.pyc
+
+# pytest's cache folder, regenerated on every test run.
+.pytest_cache/
+
+# ---------- Editor / OS junk ----------
+# Personal VS Code settings differ per machine.
+.vscode/
+# Windows and macOS folder metadata files.
+Thumbs.db
+.DS_Store
