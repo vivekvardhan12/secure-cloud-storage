@@ -1,0 +1,90 @@
+{#
+  dashboard.html
+  ==============
+  Main page for logged-in users.
+  Receives:
+    files         - list of dicts from database.list_files_for_user()
+    max_upload_mb - upload size limit, shown to the user
+
+  Security notes:
+    - The upload form uses multipart/form-data (needed for files).
+    - Delete is a POST form with a CSRF token (never a plain link).
+    - Download is a GET link: it only reads data. Ownership is checked server-side.
+    - File names are auto-escaped, so a malicious name can't inject HTML.
+#}
+{% extends "base.html" %}
+
+{% block title %}My files{% endblock %}
+
+{% block content %}
+<section class="card" aria-labelledby="upload-heading">
+  <h1 id="upload-heading">Upload a file</h1>
+  <p class="muted">
+    Files are encrypted with AES-256-GCM before being stored.
+    Maximum size: {{ max_upload_mb }} MB.
+  </p>
+
+  <form method="post" action="{{ url_for('upload') }}"
+        enctype="multipart/form-data" class="upload-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="file" class="visually-hidden">Choose a file to upload</label>
+    <input id="file" name="file" type="file" required>
+    <button type="submit" class="button">Encrypt &amp; upload</button>
+  </form>
+</section>
+
+<section class="card" aria-labelledby="files-heading">
+  <h2 id="files-heading">My files <span class="count">({{ files | length }})</span></h2>
+
+  {% if files %}
+    <div class="table-wrapper">
+      <table>
+        <caption class="visually-hidden">Your encrypted files</caption>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Size</th>
+            <th scope="col">Uploaded (UTC)</th>
+            <th scope="col">SHA-256</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for file in files %}
+            <tr>
+              <td class="file-name">{{ file.original_name }}</td>
+              <td class="nowrap">{{ file.size_bytes | filesize }}</td>
+              <td class="nowrap">{{ file.uploaded_at }}</td>
+              <td>
+                {# Short hash by default; click to reveal the full one for verification #}
+                <details>
+                  <summary><code>{{ file.sha256[:12] }}…</code></summary>
+                  <code class="hash-full">{{ file.sha256 }}</code>
+                </details>
+              </td>
+              <td>
+                <div class="actions">
+                  <a class="button button-small"
+                     href="{{ url_for('download', file_id=file.id) }}">
+                    Download<span class="visually-hidden"> {{ file.original_name }}</span>
+                  </a>
+                  <form method="post" action="{{ url_for('delete', file_id=file.id) }}"
+                        class="inline-form"
+                        data-confirm="Delete '{{ file.original_name }}'? This cannot be undone.">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="button button-small button-danger">
+                      Delete<span class="visually-hidden"> {{ file.original_name }}</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty-state">No files yet. Upload your first file above.</p>
+  {% endif %}
+</section>
+{% endblock %}

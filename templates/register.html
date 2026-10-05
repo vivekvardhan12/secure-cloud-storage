@@ -1,0 +1,55 @@
+{#
+  register.html
+  =============
+  Sign-up form. Receives: username (refilled after a failed attempt).
+
+  The HTML validation attributes below MIRROR the server rules in auth.py
+  for instant feedback. They are NOT security: the server re-checks everything.
+#}
+{% extends "base.html" %}
+
+{% block title %}Create account{% endblock %}
+
+{% block content %}
+<section class="card auth-card" aria-labelledby="register-heading">
+  <h1 id="register-heading">Create an account</h1>
+  <p class="muted">Your password is stored only as a salted PBKDF2 hash.</p>
+
+  <form method="post" action="{{ url_for('register') }}" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text"
+             value="{{ username }}"
+             required minlength="3" maxlength="30"
+             pattern="[A-Za-z0-9_]+"
+             autocomplete="username" autocapitalize="none" spellcheck="false"
+             aria-describedby="username-hint">
+      <small id="username-hint" class="hint">3–30 characters: letters, numbers and underscores.</small>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password"
+             required minlength="8" maxlength="128"
+             autocomplete="new-password"
+             aria-describedby="password-hint">
+      <small id="password-hint" class="hint">At least 8 characters. A long passphrase is best.</small>
+    </div>
+
+    <div class="field">
+      <label for="confirm_password">Confirm password</label>
+      <input id="confirm_password" name="confirm_password" type="password"
+             required minlength="8" maxlength="128"
+             autocomplete="new-password">
+    </div>
+
+    <button type="submit" class="button button-full">Create account</button>
+  </form>
+
+  <p class="muted auth-switch">
+    Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+  </p>
+</section>
+{% endblock %}

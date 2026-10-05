@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- SecureVault favicon: a simple padlock (original design) -->
+  <!-- Shackle: a thick arc above the body -->
+  <path d="M20 30V20a12 12 0 0 1 24 0v10" fill="none" stroke="#2563eb" stroke-width="6"/>
+  <!-- Body: rounded rectangle -->
+  <rect x="12" y="28" width="40" height="30" rx="6" fill="#2563eb"/>
+  <!-- Keyhole -->
+  <circle cx="32" cy="41" r="5" fill="#ffffff"/>
+  <rect x="30" y="43" width="4" height="8" rx="2" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,429 @@
+/*
+  style.css
+  =========
+  All styling for SecureVault. No inline styles are used anywhere,
+  because our Content-Security-Policy blocks them.
+
+  Sections:
+    1. Design tokens (CSS variables)
+    2. Base / reset
+    3. Layout (container, header, footer)
+    4. Components (cards, forms, buttons, flashes, table)
+    5. Page-specific (auth pages, error page)
+    6. Accessibility helpers
+    7. Responsive (small screens)
+*/
+
+/* ---------- 1. Design tokens ----------
+   Defined once, reused everywhere. Changing the brand colour means
+   editing one line. All text colours meet WCAG AA contrast (4.5:1+). */
+:root {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-danger: #dc2626;
+  --color-danger-dark: #b91c1c;
+  --color-success-bg: #dcfce7;
+  --color-success-text: #166534;
+  --color-error-bg: #fee2e2;
+  --color-error-text: #991b1b;
+  --color-text: #1f2937;
+  --color-muted: #4b5563;
+  --color-border: #d1d5db;
+  --color-background: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-focus: #f59e0b;
+
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --space: 1rem;
+
+  /* System fonts: load instantly, no external requests (which CSP would block). */
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+/* ---------- 2. Base / reset ---------- */
+
+/* Width/height include padding and border: makes sizing predictable. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-background);
+  /* Column layout so the footer sits at the bottom on short pages. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  padding-block: calc(var(--space) * 2);
+}
+
+h1,
+h2 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.25rem; }
+
+a {
+  color: var(--color-primary);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* ---------- 3. Layout ---------- */
+
+/* Centered column: full width minus 2rem margins, never wider than 960px. */
+.container {
+  width: min(100% - 2rem, 960px);
+  margin-inline: auto;
+}
+
+.site-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space);
+  padding-block: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.nav-user {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.site-footer {
+  padding-block: var(--space);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+/* ---------- 4. Components ---------- */
+
+/* Card: white panel that groups related content. */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: calc(var(--space) * 1.5);
+  margin-bottom: calc(var(--space) * 1.5);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+/* Forms */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+input[type="text"],
+input[type="password"] {
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+input[type="file"] {
+  font: inherit;
+  max-width: 100%;
+}
+
+.hint {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+/* Forms that sit inline next to other elements (logout, delete). */
+.inline-form {
+  display: inline;
+  margin: 0;
+}
+
+.upload-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  flex-wrap: wrap;
+}
+
+/* Buttons: used on <button> and on links that act like buttons. */
+.button {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.button:hover {
+  background: var(--color-primary-dark);
+  color: #ffffff;
+}
+
+.button-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.button-secondary:hover {
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.button-danger {
+  background: var(--color-danger);
+}
+
+.button-danger:hover {
+  background: var(--color-danger-dark);
+}
+
+.button-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.button-full {
+  width: 100%;
+}
+
+/* Flash messages */
+.flash-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: calc(var(--space) * 1.5);
+}
+
+.flash {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+}
+
+.flash-success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  border-color: #86efac;
+}
+
+.flash-error {
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+  border-color: #fca5a5;
+}
+
+/* File table */
+.count {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+/* On narrow screens the table scrolls sideways inside this box
+   instead of breaking the page layout. */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+th {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+}
+
+.file-name {
+  word-break: break-word; /* long file names wrap instead of overflowing */
+  font-weight: 600;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.hash-full {
+  display: block;
+  margin-top: 0.25rem;
+  word-break: break-all; /* 64-char hash wraps inside the cell */
+  font-size: 0.8rem;
+}
+
+summary {
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  color: var(--color-muted);
+  text-align: center;
+  padding: calc(var(--space) * 2) 0;
+  margin: 0;
+}
+
+/* ---------- 5. Page-specific ---------- */
+
+/* Login / register: narrow centered card. */
+.auth-card {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.auth-switch {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.error-card {
+  text-align: center;
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+.error-code {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+/* ---------- 6. Accessibility helpers ---------- */
+
+/* Clear focus ring for keyboard users (not shown on mouse clicks). */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Hidden visually, but still read by screen readers.
+   (display:none would hide it from screen readers too.) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Off-screen until focused with the Tab key. */
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -3rem;
+  background: var(--color-surface);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  z-index: 10;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* ---------- 7. Responsive ---------- */
+
+@media (max-width: 640px) {
+  .card {
+    padding: var(--space);
+  }
+
+  /* Stack the upload form vertically on phones. */
+  .upload-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .upload-form .button {
+    width: 100%;
+  }
+
+  .nav-user {
+    width: 100%;

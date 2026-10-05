@@ -1,0 +1,74 @@
+{#
+  base.html
+  =========
+  Shared layout for every page. Child templates fill two blocks:
+    - title   : text for the browser tab
+    - content : the page body
+
+  Security notes:
+    - All {{ }} output is auto-escaped by Jinja (XSS protection).
+    - No inline <script> or style="" anywhere: our Content-Security-Policy
+      blocks them. JS and CSS load from /static only.
+    - The logout button is a POST form with a CSRF token.
+#}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Home{% endblock %} · SecureVault</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {# defer: download in parallel, run after the HTML is parsed #}
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  {# First focusable element: lets keyboard users skip the navbar #}
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span aria-hidden="true">🔒</span> SecureVault
+      </a>
+
+      <nav class="site-nav" aria-label="Main navigation">
+        {% if g.user %}
+          <span class="nav-user">Signed in as <strong>{{ g.user.username }}</strong></span>
+          <form method="post" action="{{ url_for('logout') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="button button-secondary button-small">Log out</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('login') }}">Log in</a>
+          <a href="{{ url_for('register') }}" class="button button-small">Sign up</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container">
+    {# Flash messages set by flash() in app.py; each is shown once #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-list">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}"
+                 role="{{ 'alert' if category == 'error' else 'status' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Files are encrypted with AES-256-GCM before storage and verified with SHA-256 on download.
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{#
+  login.html
+  ==========
+  Login form. Receives: username (to refill the field after a failed attempt).
+  The password is never sent back to the page.
+#}
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+<section class="card auth-card" aria-labelledby="login-heading">
+  <h1 id="login-heading">Log in</h1>
+  <p class="muted">Access your encrypted files.</p>
+
+  <form method="post" action="{{ url_for('login') }}" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text"
+             value="{{ username }}"
+             required maxlength="30"
+             autocomplete="username" autocapitalize="none" spellcheck="false">
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password"
+             required maxlength="128"
+             autocomplete="current-password">
+    </div>
+
+    <button type="submit" class="button button-full">Log in</button>
+  </form>
+
+  <p class="muted auth-switch">
+    No account yet? <a href="{{ url_for('register') }}">Create one</a>
+  </p>
+</section>
+{% endblock %}

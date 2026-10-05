@@ -1,0 +1,19 @@
+{#
+  error.html
+  ==========
+  Shown by the error handlers in app.py.
+  Receives: error_code, error_title, error_message.
+  For 500 errors, app.py passes a generic message; real details stay in the server log.
+#}
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }}{% endblock %}
+
+{% block content %}
+<section class="card error-card" aria-labelledby="error-heading">
+  <p class="error-code" aria-hidden="true">{{ error_code }}</p>
+  <h1 id="error-heading">{{ error_title }}</h1>
+  <p>{{ error_message }}</p>
+  <a class="button" href="{{ url_for('index') }}">Go to home page</a>
+</section>
+{% endblock %}
